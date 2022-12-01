@@ -1,5 +1,5 @@
 import tensorflow as tf
-# from tensorflow import keras
+from tensorflow import keras
 # from tensorflow.kersas import layers
 import numpy
 import pandas
@@ -10,4 +10,6 @@ from sklearn import datasets
 digits = datasets.load_digits()
 
 im = digits.images[1]
-print(digits.images.shape)
+print(im)
+
+
