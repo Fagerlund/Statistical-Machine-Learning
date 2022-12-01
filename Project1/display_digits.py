@@ -7,8 +7,8 @@ from sklearn import datasets
 digits = datasets.load_digits()
 
 im = digits.images[1]
-print(im.shape)
+print(digits.images.shape)
 plt.gray() 
-plt.matshow(digits.images[1]) 
-plt.matshow(digits.images[2]) 
+plt.matshow(digits.images[1])
+plt.matshow(digits.images[10])
 plt.show() 
