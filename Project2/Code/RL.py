@@ -181,7 +181,6 @@ def learn_MC(env, n_sims, gamma = 1, epsilon = 0.05,
             
             # Draw the next state and reward of previous action
             state2, action_reward, done, info = env.step(action)
-            prev_state = state
             state = state2
             episode_reward += action_reward
 
@@ -198,7 +197,11 @@ def learn_MC(env, n_sims, gamma = 1, epsilon = 0.05,
             # Update the Q-function for each visited state/action pair. 
         
         avg_reward = avg_reward + (1 / episode)*(action_reward-avg_reward)
-        Q[prev_state][action] = Q[prev_state][action] + (1/state_action_count[prev_state][action]*(episode_reward- Q[prev_state][action]))
+
+        for state in episode_state_action_count:
+            for action in episode_state_action_count[state]:
+                if episode_state_action_count[state][action]==1:
+                    Q[state][action] = Q[state][action] + (1/state_action_count[state][action]*(episode_reward- Q[state][action]))
         
 
         

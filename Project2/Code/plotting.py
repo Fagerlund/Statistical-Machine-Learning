@@ -43,7 +43,7 @@ def plot_value_function(V, title="Value Function",
         ax.view_init(ax.elev, -120)
         fig.colorbar(surf)
         if file_name:
-            fig.savefig(directory + usable_ace + file_name, bbox_inces = 'tight')
+            fig.savefig(directory + usable_ace + file_name, bbox_inches = 'tight')
         if show:
             fig.show()
         plt.close(fig)

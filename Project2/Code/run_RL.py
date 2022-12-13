@@ -21,7 +21,7 @@ if __name__ == "__main__":
     if not os.path.exists(directory):
         os.makedirs(directory)
     path_fun = lambda x: "{}/{}_{}.txt".format(directory,x, decks)
-    # init constants
+    # init constants 
     omega = 0.77        # power decay of the learning rate
     n_sims = 10 ** 3    # Number of episodes generated
     epsilon = 0.05      # Probability in epsilon-soft strategy
