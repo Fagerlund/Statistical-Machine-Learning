@@ -57,10 +57,14 @@ def learn_Q(env, n_sims, gamma = 1, omega = 0.77, epsilon = 0.05,
             # Draw the next state and reward of previous action
             state2, action_reward, done, info = env.step(action)
     #######################################################################
+            C=1
+            #print(state_action_count)
+            #print(episode**omega)
+            #alpha=state_action_count[state][action]/((episode)**(omega))
+            alpha=1/(state_action_count[state][action]**omega)
+            Q[state][action]=Q[state][action]+alpha*(action_reward+gamma*max(Q[state2][:]-Q[state][action]))
             # YOUR CODE HERE
-            # Compute the learning rate and update the Q-function
-            alpha = 1/(state_action_count[state][action]**omega)
-            Q[state][action] = Q[state][action] + alpha*(action_reward + gamma*max(Q[state2][:]-Q[state][action]))
+            # Compute the learning rate and update the Q-function 
 
 
 
@@ -151,6 +155,7 @@ def learn_MC(env, n_sims, gamma = 1, epsilon = 0.05,
     state_action_count = defaultdict(lambda: np.zeros(env.action_space.n,
                                                       dtype = int))
     avg_reward = 0.0
+    total_reward = 0.0
     # if we want to save the episode reward to a file,
     if episode_file:
         f = open(episode_file, "w+")
@@ -178,13 +183,16 @@ def learn_MC(env, n_sims, gamma = 1, epsilon = 0.05,
             # Update the state-action count
             state_action_count[state][action] += 1
             episode_state_action_count[state][action] += 1
-            
+            #print(state_action_count[state][action])
             # Draw the next state and reward of previous action
+            prev_state=state
+            
             state2, action_reward, done, info = env.step(action)
-            prev_state = state
             state = state2
             episode_reward += action_reward
-
+            #print(episode_reward)
+            print(action_reward)
+            #print(state)
         if episode % (n_sims // 100) == 0:
             print('Mean avg reward, after {} episodes: {}'.format(
                 episode, avg_reward))
@@ -194,11 +202,18 @@ def learn_MC(env, n_sims, gamma = 1, epsilon = 0.05,
         # Game (episode) is over
      #################################################################### 
         # YOUR CODE HERE
+        
+
+        avg_reward= avg_reward + (1 / episode)*(action_reward-avg_reward)
+        #print(avg_reward)
+        G=0
+        #for k in(range(K)):
+        #    G=G+gamma**k*episode_reward
+        #G=disc
+        #Q[state][action]=Q[state][action]+ (1/state_action_count[state][action]*(episode_reward- Q[state][action]))
+        Q[prev_state][action]=Q[prev_state][action]+ (1/state_action_count[prev_state][action]*(episode_reward- Q[prev_state][action]))
             # Update avg_reward
             # Update the Q-function for each visited state/action pair. 
-        
-        avg_reward = avg_reward + (1 / episode)*(action_reward-avg_reward)
-        Q[prev_state][action] = Q[prev_state][action] + (1/state_action_count[prev_state][action]*(episode_reward- Q[prev_state][action]))
         
 
         
