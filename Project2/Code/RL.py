@@ -70,8 +70,8 @@ def learn_Q(env, n_sims, gamma = 1, omega = 0.77, epsilon = 0.05,
             episode_reward += action_reward
 
         if episode % (n_sims // 100) == 0:
-            print('Mean avg reward, after {} episodes: {}'.format(
-                episode, avg_reward))
+            # print('Mean avg reward, after {} episodes: {}'.format(
+            #     episode, avg_reward))
             if f:
                 # append to the file which we want to save to
                 f.write("{},{}\n".format(episode, str(avg_reward)))
@@ -185,8 +185,8 @@ def learn_MC(env, n_sims, gamma = 1, epsilon = 0.05,
             episode_reward += action_reward
 
         if episode % (n_sims // 100) == 0:
-            print('Mean avg reward, after {} episodes: {}'.format(
-                episode, avg_reward))
+            # print('Mean avg reward, after {} episodes: {}'.format(
+            #     episode, avg_reward))
             if f:
                 # append to the file which we want to save to
                 f.write("{},{}\n".format(episode, str(avg_reward)))
@@ -197,9 +197,9 @@ def learn_MC(env, n_sims, gamma = 1, epsilon = 0.05,
             # Update the Q-function for each visited state/action pair. 
         
         avg_reward = avg_reward + (1 / episode)*(action_reward-avg_reward)
-
-        for state in episode_state_action_count:
-            for action in episode_state_action_count[state]:
+        
+        for state in episode_state_action_count: # goes through states
+            for action in episode_state_action_count[state]: # goes through actions
                 if episode_state_action_count[state][action]==1:
                     Q[state][action] = Q[state][action] + (1/state_action_count[state][action]*(episode_reward- Q[state][action]))
         

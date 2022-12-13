@@ -9,10 +9,12 @@ from math import inf
 import RL as rl
 import sys
 import os
+import os.path
 
 import plotting as pl
 import time
 import matplotlib
+import csv
 
 matplotlib.style.use('ggplot')
 
@@ -23,76 +25,85 @@ if __name__ == "__main__":
     path_fun = lambda x: "{}/{}_{}.txt".format(directory,x, decks)
     # init constants 
     omega = 0.77        # power decay of the learning rate
-    n_sims = 10 ** 3    # Number of episodes generated
+    n_sims = 10 ** 4    # Number of episodes generated
     epsilon = 0.05      # Probability in epsilon-soft strategy
     init_val = 0.0
     warmup = n_sims//10
     # Directory to save plots in
-    plot_dir = "{}/figures/".format(sys.path[0])
+    plot_dir = "{}/figtest/".format(sys.path[0])
+    sumq_dir = "{}/sumqtest/".format(sys.path[0])
 
     
 
     for decks in [1,2,6,8,inf]:
-        print("----- deck number equal to {} -----".format(decks))
+        # print("----- deck number equal to {} -----".format(decks))
         # set seed
         seed = 31233
         # init envs.
-        env = bjk.BlackjackEnvExtend(decks=decks, seed=seed)
+        # env = bjk.BlackjackEnvExtend(decks=decks, seed=seed)
         sum_env = bjk_base.BlackjackEnvBase(decks=decks, seed=seed)
 
-        print("----- Starting MC training on expanded state space -----")
-        # MC-learning wit expanded state representation
-        start_time_MC = time.time()
-        Q_MC, MC_avg_reward, state_action_count = rl.learn_MC(
-            env, n_sims, gamma = 1, epsilon = epsilon, init_val = init_val,
-            episode_file=path_fun("hand_MC_state"), warmup=warmup)
-        print("Number of explored states: " + str(len(Q_MC)))
-        print("Cumulative avg. reward = " + str(MC_avg_reward))
-        time_to_completion_MC = time.time() - start_time_MC
+        # print("----- Starting MC training on expanded state space -----")
+        # # MC-learning wit expanded state representation
+        # start_time_MC = time.time()
+        # Q_MC, MC_avg_reward, state_action_count = rl.learn_MC(
+        #     env, n_sims, gamma = 1, epsilon = epsilon, init_val = init_val,
+        #     episode_file=path_fun("hand_MC_state"), warmup=warmup)
+        # print("Number of explored states: " + str(len(Q_MC)))
+        # print("Cumulative avg. reward = " + str(MC_avg_reward))
+        # time_to_completion_MC = time.time() - start_time_MC
 
-        print("----- Starting Q-learning on expanded state space -----")
-        # Q-learning with expanded state representation
-        start_time_expanded = time.time()
-        Q, avg_reward, state_action_count = rl.learn_Q(
-            env, n_sims, gamma = 1, omega = omega, epsilon = epsilon, init_val = init_val,
-            episode_file=path_fun("hand_state"), warmup=warmup)
-        print("Number of explored states: " + str(len(Q)))
-        print("Cumulative avg. reward = " + str(avg_reward))
-        time_to_completion_expanded = time.time() - start_time_expanded
+        # print("----- Starting Q-learning on expanded state space -----")
+        # # Q-learning with expanded state representation
+        # start_time_expanded = time.time()
+        # Q, avg_reward, state_action_count = rl.learn_Q(
+        #     env, n_sims, gamma = 1, omega = omega, epsilon = epsilon, init_val = init_val,
+        #     episode_file=path_fun("hand_state"), warmup=warmup)
+        # print("Number of explored states: " + str(len(Q)))
+        # print("Cumulative avg. reward = " + str(avg_reward))
+        # time_to_completion_expanded = time.time() - start_time_expanded
         
-        print("----- Starting Q-learning for sum-based state space -----")
+
+        # print("----- Starting Q-learning for sum-based state space -----")
         # Q-learning with player sum state representation
         start_time_sum = time.time()
         sumQ, sum_avg_reward, sum_state_action_count = rl.learn_Q(
             sum_env, n_sims, omega = omega, epsilon = epsilon, init_val = init_val,
             episode_file=path_fun("sum_state"), warmup=warmup)
         time_to_completion_sum = time.time() - start_time_sum
-        print("Number of explored states (sum states): " + str(len(sumQ)))
-        print("Cumulative avg. reward = " + str(sum_avg_reward))
+        # print("Number of explored states (sum states): " + str(len(sumQ)))
+        # print("Cumulative avg. reward = " + str(sum_avg_reward))
 
-        print("Training time: \n " +
-              "Expanded state space MC: {} \n Expanded state space: {} \n Sum state space: {}".format(
-                 time_to_completion_MC, time_to_completion_expanded, time_to_completion_sum))
+
+        # print("Training time: \n " +
+        #       "Expanded state space MC: {} \n Expanded state space: {} \n Sum state space: {}".format(
+        #          time_to_completion_MC, time_to_completion_expanded, time_to_completion_sum))
+
+        print("Training time: \n " + "Sum state space: {}".format(time_to_completion_sum))
 
 
         # Convert Q (extended state) to sum state representation and make 3D plots
         # Extended state MC-learning
-        Q_conv_MC = rl.convert_to_sum_states(Q_MC, env)
-        V_conv_MC = rl.convert_to_value_function(Q_conv_MC)
-        V_conv_filt_MC = rl.fill_missing_sum_states(rl.filter_states(V_conv_MC))
-        pl.plot_value_function(V_conv_filt_MC,
-                               title = "Expanded state MC, " + str(decks) + " decks",
-                               directory = plot_dir,
-                               file_name = "3D_exp_MC_" + str(decks) + "_decks.png")
+
+        # Q_conv_MC = rl.convert_to_sum_states(Q_MC, env)
+        # V_conv_MC = rl.convert_to_value_function(Q_conv_MC)
+        # V_conv_filt_MC = rl.fill_missing_sum_states(rl.filter_states(V_conv_MC))
+        # pl.plot_value_function(V_conv_filt_MC,
+        #                        title = "Expanded state MC, " + str(decks) + " decks",
+        #                        directory = plot_dir,
+        #                        file_name = "3D_exp_MC_" + str(decks) + "_decks.png")
+
 
         # Extended state Q-learning
-        Q_conv = rl.convert_to_sum_states(Q, env)
-        V_conv = rl.convert_to_value_function(Q_conv)
-        V_conv_filt = rl.fill_missing_sum_states(rl.filter_states(V_conv))
-        pl.plot_value_function(V_conv_filt,
-                               title = "Expanded state, " + str(decks) + " decks",
-                               directory = plot_dir,
-                               file_name = "3D_exp_" + str(decks) + "_decks.png")
+
+        # Q_conv = rl.convert_to_sum_states(Q, env)
+        # V_conv = rl.convert_to_value_function(Q_conv)
+        # V_conv_filt = rl.fill_missing_sum_states(rl.filter_states(V_conv))
+        # pl.plot_value_function(V_conv_filt,
+        #                        title = "Expanded state, " + str(decks) + " decks",
+        #                        directory = plot_dir,
+        #                        file_name = "3D_exp_" + str(decks) + "_decks.png")
+
 
         # Likewise make 3D plots for sumQ
         V_sum = rl.convert_to_value_function(sumQ)
@@ -102,8 +113,20 @@ if __name__ == "__main__":
                                directory = plot_dir,
                                file_name = "3D_sum_" + str(decks) + "_decks.png")
         # create line plots
-        env_types = ["hand_MC", "hand", "sum"]
+        env_types = ["sum"]
         fig, lgd = pl.plot_avg_reward_episode(directory, env_types, [str(decks)])
         fig.savefig("{}/avgReturnEp_ndeck{}.png".format(plot_dir, decks),
                                 bbox_extra_artists=(lgd,), bbox_inches='tight')
         matplotlib.pyplot.close(fig)
+
+        # Save sumQ in CSV-file
+        with open('sumQ_{}.csv'.format(str(decks)), 'w') as f:
+            for key in sumQ.keys():
+                f.write("%s,%s\n"%(key,sumQ[key]))
+
+    # with open('sumQ_1.csv', mode='r') as infile:
+    #     #reader = csv.reader(infile)
+    #     for line in csv.reader(infile):
+    #         print(line)
+    # print(sumQ)
+    
