@@ -25,7 +25,7 @@ if __name__ == "__main__":
     path_fun = lambda x: "{}/{}_{}.txt".format(directory,x, decks)
     # init constants 
     omega = 0.77        # power decay of the learning rate
-    n_sims = 10 ** 4    # Number of episodes generated
+    n_sims = 10 ** 7    # Number of episodes generated
     epsilon = 0.05      # Probability in epsilon-soft strategy
     init_val = 0.0
     warmup = n_sims//10
